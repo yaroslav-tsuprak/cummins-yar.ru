@@ -1,0 +1,40 @@
+version: "3"
+services:
+  nginx:
+    image: nginx:1.13-alpine
+    restart: always
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/errors.log:/var/logs/errors.log
+      - ./nginx/access.log:/var/logs/access.log
+      - ./opencart/:/var/www/html
+    ports:
+      - "10080:80"
+    command: nginx -g "daemon off;"
+  php:
+    build:
+      context: .
+      dockerfile: php.Dockerfile
+    restart: always
+    user: "1000"
+    volumes:
+      - ./opencart/php.ini:/usr/local/etc/php/conf.d/opencart.ini:ro
+      - ./timezone.php.ini:/usr/local/etc/php/conf.d/timezone.php.ini:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./opencart/:/var/www/html
+  mysql:
+    image: mysql:5.7
+    user: "1000"
+    restart: always
+    environment:
+      - MYSQL_DATABASE=opencart
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=opencart
+      - MYSQL_PASSWORD=opencart
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+

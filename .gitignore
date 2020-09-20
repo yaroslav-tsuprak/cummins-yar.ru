@@ -1,0 +1,3 @@
+nginx/errors.log
+nginx/access.log
+mysql/data/*
